@@ -1,0 +1,73 @@
+/*{
+    "type": "library",
+    "targets": ["omnifocus"],
+    "identifier": "org.0x3f.libdev",
+    "version": "1.0"
+}*/
+(() => {
+    if (!Task.prototype.isTaggedUnder) {
+        Task.prototype.isTaggedUnder = function (tag) {
+            return this.tags.some(t => {
+                while (t) {
+                    if (t.id.primaryKey === tag.id.primaryKey) {
+                        return true;
+                    }
+
+                    t = t.parent;
+
+                    if (t === null) {
+                        return false;
+                    }
+                }
+            });
+        };
+    }
+
+    const lib = new PlugIn.Library(new Version("1.0"));
+  
+    lib.isPreferenceAction = function(sender) {
+        return (app.platformName === "macOS" && app.controlKeyDown) || (app.platformName === 'iOS' && sender instanceof MenuItem);
+    };
+
+    lib.getJson = function(preferences, option, defaultValue = null) {
+        let value = preferences.readString(option);
+
+        if (value) {
+            value = JSON.parse(value);
+        } else {
+            value = defaultValue;
+        }
+
+        return value;
+    };
+
+    lib.setJson = function(preferences, option, form) {
+        let value = form.values[option];
+
+        if (value) {
+            preferences.write(option, JSON.stringify(value));
+        }
+    };
+
+    lib.getString = function(preferences, option, defaultValue = null) {
+        let value = preferences.readString(option);
+
+        if (value) {
+            value = value.trim();
+        } else {
+            value = defaultValue;
+        }
+
+        return value;
+    };
+
+    lib.setString = function(preferences, option, form) {
+        let value = form.values[option];
+
+        if (value) {
+            preferences.write(option, value.trim());
+        }
+    };
+
+    return lib;
+})();
