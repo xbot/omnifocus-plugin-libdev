@@ -65,8 +65,10 @@
         let value = form.values[option];
 
         if (value) {
-            preferences.write(option, value.trim());
+            value = value.trim();
         }
+
+        preferences.write(option, value);
     };
 
     return lib;
